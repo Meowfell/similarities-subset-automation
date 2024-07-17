@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAIS-IV Similarities Subtest</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 2em;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 1em 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="test-container">
+        <h1>WAIS-IV Similarities Subtest</h1>
+        <p>No external resources allowed, to be done in one sitting</p>
+        <p>It is ideal that you emulate an in-person proxy, and write your thoughts freely</p>
+        <p>This test is untimed, but you are discouraged from taking too long on a single question, since the likelihood that you will score decreases after optimal time has been spent</p>
+        <button id="start-test">Start Test</button>
+    </div>
+
+    <script>
+        const questions = [
+            "In what way are a FORK and a SPOON alike?",
+            "In what way are YELLOW and GREEN alike?",
+            "In what way are CARROTS and BROCCOLI alike?",
+            "In what way are a HORSE and a TIGER alike?",
+            "In what way are a PIANO and a DRUM alike?",
+            "In what way are a BOAT and an AUTOMOBILE alike?",
+            "In what way are a NOSE and a TONGUE alike?",
+            "In what way are FOOD and GASOLINE alike?",
+            "In what way are a BADGE and a CROWN alike?",
+            "In what way are a BUD and a BABY alike?",
+            "In what way are MUSIC and TIDES alike?",
+            "In what way are a POEM and a STATUE alike?",
+            "In what way are an ANCHOR and a FENCE alike?",
+            "In what way are WISH and EXPECT alike?",
+            "In what way are ACCEPTANCE and DENIAL alike?",
+            "In what way are ALWAYS and NEVER alike?",
+            "In what way are an ENEMY and a FRIEND alike?",
+            "In what way are ALLOW and RESTRICT alike?"
+        ];
+
+        let currentQuestion = 0;
+
+        document.getElementById('start-test').addEventListener('click', () => {
+            loadQuestion();
+        });
+
+        function loadQuestion() {
+            if (currentQuestion < questions.length) {
+                document.getElementById('test-container').innerHTML = `
+                    <h2>Question ${currentQuestion + 1}</h2>
+                    <p>${questions[currentQuestion]}</p>
+                    <textarea id="answer" rows="4"></textarea>
+                    <button onclick="submitAnswer()">Next</button>
+                `;
+            } else {
+                document.getElementById('test-container').innerHTML = `
+                    <h2>Test Completed</h2>
+                    <p>Thank you for completing the test.</p>
+                `;
+            }
+        }
+
+        function submitAnswer() {
+            const answer = document.getElementById('answer').value;
+            if (answer.trim() !== "") {
+                // Send the answer to the backend
+                fetch('/submit-answer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question: currentQuestion + 1, answer: answer })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    currentQuestion++;
+                    loadQuestion();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            } else {
+                alert("Please provide an answer before moving to the next question.");
+            }
+        }
+    </script>
+</body>
+</html>
